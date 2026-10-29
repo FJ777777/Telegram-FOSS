@@ -1,0 +1,26 @@
+name: Build Telegraph APK
+on:
+  push:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: android-actions/setup-android@v3
+      - name: Instalar NDK y CMake
+        run: sdkmanager "ndk;21.4.7075529" "cmake;3.10.2.4988404" || true
+      - name: Compilar
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: telegraph-apk
+          path: "**/build/outputs/apk/**/*.apk"
